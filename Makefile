@@ -28,9 +28,6 @@ $(PROGRAM): $(OBJECTS)
 
 %.c: %.h
 
-clean:
-	rm $(OBJECTS)
-
 %.o: %.c %.h
 	$(CC) -c -o $@ $(CFLAGS) $< 
 
@@ -44,4 +41,4 @@ clean:
 	./parser $< $*.out 2> $@
 
 clean: 
-	rm *.yy.o *tab.o *tab.h *.output lea
+	rm -f *.yy.o *tab.o *tab.h *.output lea

@@ -1,0 +1,39 @@
+/* **************************************************
+ *
+ * Ce fichier teste l'interpréteur
+ * usage:
+ * ./interpreter progr5.lea
+ *
+ ************************************************** */
+//
+// gestion de la pile
+// 
+// Résultat attendu
+// 8
+// 6
+//
+var
+x : integer;
+
+function sum(i : integer, j : integer) : integer
+begin
+  return (i+j);
+end
+
+function pgcd(i : integer, j : integer) : integer
+begin
+	while (i != j) do
+		if (i > j) then
+			i := i - j;
+		else
+			j := j - i;
+  return (i);
+end
+
+
+
+begin
+x := 5;
+println(sum(3, x));
+println(pgcd(78, 90));
+end
