@@ -14,7 +14,7 @@ int yyerror(char *s);
 %right TOKEN_ELSE
 %left ';'
 %nonassoc '!'
-/* chose à ajouter dans les left/right pour éviter les ambigüités :
+/* chose à ajouter dans les left/right pour éviter les ambigüités ET pour que ça reconnaisse tout:
 ',' ':' ';' '[' ']' '^'
 TOKEN_AFF TOKEN_ARRAY TOKEN_BEGIN TOKEN_CHARACTER TOKEN_DISPOSE TOKEN_DO TOKEN_DOTDOT
 TOKEN_END TOKEN_FALSE TOKEN_FUNCTION TOKEN_NEW TOKEN_NE TOKEN_NULL TOKEN_OF
@@ -274,10 +274,11 @@ literal:
 
  %%
  int yyerror(char *s){
-   fprintf( stderr, "*** ERROR: %s\n", s );
+   fprintf( stderr, "********** ERROR: %s\n", s );
    return 0;
  }
 
  int main(int argn, char **argv){
    yyparse();
+   return 0;
  }

@@ -52,5 +52,5 @@ idname  ([0-9]|[a-zA-Z])+
 %%
 
 int yywrap(){
-   return 1;
+   return 0;
 }
