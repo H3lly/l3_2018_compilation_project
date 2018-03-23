@@ -2,86 +2,53 @@
 #include "lea.init.tab.h"
 %}
 
+integer	("0x"([0-9]|[A-F])+) | ("-"(0|[1-9][0-9]*)) | ((0|[1-9][0-9]*))
 
 
 %option nounput noinput
 %%
 
 
-"+"		{return PLUS;}
-"-" 	{return LESS;}
-"*"		{return MULT;}
-"/"		{return DIV; }
-"||"	{return OR;}
-"&&"	{return AND;}
+/* not sure about these two :*/
+"'"{name}"'"	{return TOKEN_IDENTIFIER;}
+/* TOKEN_PROCEDURE ???*/
+
+
+"||"	{return TOKEN_OR;}
+"&&"	{return TOKEN_AND;}
+"<="	{return TOKEN_LE;}
+">="	{return TOKEN_GE;}
+"!="	{return TOKEN_NE;}
+":="	{return TOKEN_AFF;}
+".."	{return TOKEN_DOTDOT;
+"if"		{return TOKEN_IF;}
+"then"		{return TOKEN_THEN;}
+"else"		{return TOKEN_ELSE;}
+
 [^0-9]"-"[0-9]+	{return NEG;}
-"!"		{return NOT;}
-"<"(^=)	{return ST;}
-"<="	{return SET;}
-">"(^=)	{return GT;}
-">="	{return GET;}
-":="	{return AFF;}
-(^!)(^<)(^>)"="	{return EQ;}
-"!="	{return NOTEQ;}
-"("		{return LP;}
-")"		{return RP;}
-":"(^=)	{return COL;}
-";"		{return SEQ;}
-"["		{return LB;}
-"]"		{return RB;}
-".."	{return DD;}
-"function"	{return FUN;}
-"boolean"	{return BOOL;}
-"integer"	{return INT;}
-"begin"		{return BEGIN;}
-"end"		{return END;}
-"return"	{return RET;}
-"array"		{return ARR;}
-"of"		{return OF;}
-"if"		{return IF;}
-"then"		{return THEN;}
-"else"		{return ELSE;}
-"do"		{return DO;}
-"while"		{return WHILE;}
-"^"			{return PTR;}
-"var"		{return VAR;}
-"new"		
-"null"
-"dispose"
-"'"
-"println"
-"character"
-[0-9]* 		{return INTEGER;}
-[0x00000000-0xFFFFFFFF] {return HEXA;}
 
-/*
-A FAIRE : 
-[entier]??
-[hexa]??
+"function"	{return TOKEN_FUNCTION;}
+"boolean"	{return TOKEN_BOOLEAN;}
+"integer"	{return TOKEN_INTEGER;}
+"character"	{return TOKEN_CHARACTER;}
+"print"		{return TOKEN_PRINT;}
+"begin"		{return TOKEN_BEGIN;}
+"end"		{return TOKEN_END;}
+"return"	{return TOKEN_RETURN;}
+"array"		{return TOKEN_ARRAY;}
+"of"		{return TOKEN_OF;}
+"type"		{return TOKEN_TYPE;}
+"do"		{return TOKEN_DO;}
+"while"		{return TOKEN_WHILE;}
+"var"		{return TOKEN_VAR;}
+"new"		{return TOKEN_NEW;}
+"null"		{return TOKEN_NULL;}
+"dispose"	{return TOKEN_DISPOSE;}
+"println"	{return TOKEN_PRINTLN;}
+"false"		{return TOKEN_FALSE;}
+"true"		{return TOKEN_TRUE;}
 
-
-
-[A-Za-z][A-Za-z0-9]* {return IDENTIFIER;}
-0|[1-9][0-9]*        {return INTEGER;}
-";"                  {return SEMICOLON;}
-"+"                  {return PLUS;}
-"-"                  {return MINUS;}
-"*"                  {return TIMES;}
-"/"                  {return DIV;}      
-"||"                 {return OR;} 
-"&&"                 {return AND;}
-"!"                  {return NOT;}
-"<"                  {return LT;}
-"<="                 {return LE;}
-">"                  {return GT;}
-">="                 {return GE;}
-"="                  {return EQ;}
-"!="                 {return DIFF;}
-"("                  {return LPAR;}
-")"                  {return RPAR;}
-
-mettre les TOKEN ICI
-*/
+{integer}	{return TOKEN_INTEGER;}
 %%
 
 int yywrap(){
