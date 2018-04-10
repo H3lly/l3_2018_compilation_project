@@ -16,10 +16,21 @@ integer 	(("0x"([0-9]|[A-F])+)|("-"(0|[1-9][0-9]*))|((0|[1-9][0-9]*)))
 operator	"!"|"("|")"|"*"|"+"|","|":"|"/"|"-"|";"|"<"|">"|"="|"["|"]"|"^"
 identifier 	[a-zA-Z][a-zA-Z0-9]*
 character 	"'"[a-zA-Z]"'"
-comment1	^(\/\*)(.|\n)*(\*\/)$
 comment2	^(\/\/).*$
 
+%x MULTI_COMMENT MONO_COMMENT
+
 %%
+"/*"				{BEGIN(MULTI_COMMENT);}
+<MULTI_COMMENT>"*/"	{	column+=(yyleng+1);
+						/*++numEL;*/
+                		printf("Multi-line commentary accepted.\n"); 
+						/*yylval.Chaine=strdup(yytext);*/
+          				return 0;
+          			}
+<MULTI_COMMENT>\n 	{;}
+<MULTI_COMMENT>.	{;}
+
 
 
 {character}	 	{column+=(yyleng+1);return CHARACTER;}
@@ -62,13 +73,6 @@ comment2	^(\/\/).*$
             			error_nb++;
 						fprintf(stderr, "Error n.%d : the integer \"%d\"  at l:%d, c:%d is either too small or too big (%d, %d).\n",error_nb, tmp, line, column-yyleng, INT_MIN, INT_MAX);
 					} else return INTEGER; 
-				}
-
-{comment1}		{	column+=(yyleng+1);
-					/*++numEL;*/
-                	printf("Multi-line commentary accepted.\n"); 
-					/*yylval.Chaine=strdup(yytext);*/
-          			return 0;
 				}
 
 {comment2}		{	column+=(yyleng+1);
