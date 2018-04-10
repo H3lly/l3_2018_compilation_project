@@ -67,6 +67,7 @@ comment2	^(\/\/).*$
 "boolean"		{column+=(yyleng+1);return TOKEN_BOOLEAN;}
 
 
+
 {integer}		{column+=(yyleng);
 					tmp=atoi(yytext);
             		if((tmp<INT_MIN)||(INT_MAX<tmp)){
