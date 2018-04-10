@@ -8,13 +8,11 @@ int yyerror(char *s);
 %left '+' '-'
 %left '/' '*'
 %left TOKEN_OR TOKEN_AND '<' TOKEN_LE '>' TOKEN_GE '=' DIFF
-%right '('
-%left ')'
+%right '(' '['
+%left ')' ']'
 %right TOKEN_IF TOKEN_THEN
 %right TOKEN_ELSE
-%left ';'
-%nonassoc '!' TOKEN_AFF '^' ':' ';' ','
-
+%nonassoc '!' ';' ':' ',' '^' TOKEN_AFF
 /* chose à ajouter dans les left/right pour éviter les ambigüités ET pour que ça reconnaisse tout:
 TOKEN_ARRAY TOKEN_BEGIN TOKEN_CHARACTER TOKEN_DISPOSE TOKEN_DO TOKEN_DOTDOT
 TOKEN_END TOKEN_FALSE TOKEN_FUNCTION TOKEN_NEW TOKEN_NE TOKEN_NULL TOKEN_OF
