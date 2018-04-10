@@ -90,7 +90,6 @@ comment2	^(\/\/).*$
 				}
 
 
-
 {operator}		{column++;}
 " "				{column++; }
 "\t"			{column++; }
