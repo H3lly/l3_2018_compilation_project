@@ -1,96 +1,99 @@
 %{
 	#include<stdio.h>
 	#include<stdlib.h>
+	#include<limits.h>
 	#include "lea.init.tab.h"
 	extern YYSTYPE yylval;
 
-	int yycol =1;
-	int yylineo =1;
+	int column = 1;
+	int line = 1;
 	int error_nb = 0;
 	int tmp;
 	FILE *yyin;
 %}
 
-integer (("0x"([0-9]|[A-F])+)|("-"(0|[1-9][0-9]*))|((0|[1-9][0-9]*)))
-identifier [a-zA-Z][a-zA-Z0-9]*
-character "'"[a-zA-Z]"'"
+integer 	(("0x"([0-9]|[A-F])+)|("-"(0|[1-9][0-9]*))|((0|[1-9][0-9]*)))
+operator	"!"|"("|")"|"*"|"+"|","|":"|"/"|"-"|";"|"<"|">"|"="|"["|"]"|"^"
+identifier 	[a-zA-Z][a-zA-Z0-9]*
+character 	"'"[a-zA-Z]"'"
 comment1	^(\/\*)(.|\n)*(\*\/)$
 comment2	^(\/\/).*$
 
 %%
 
 
-{character}	 	{yycol+=(yyleng+1);return CHARACTER;}
-"procedure"		{yycol+=(yyleng+1);return TOKEN_PROCEDURE;}
-":="			{yycol+=(yyleng+1);return TOKEN_AFF;}
-"&&"			{yycol+=(yyleng+1);return TOKEN_AND;}
-"character"		{yycol+=(yyleng+1);return TOKEN_CHARACTER;}
-".."			{yycol+=(yyleng+1);return TOKEN_DOTDOT;}
-"<="			{yycol+=(yyleng+1);return TOKEN_LE;}
-">="			{yycol+=(yyleng+1);return TOKEN_GE;}
-"!="			{yycol+=(yyleng+1);return TOKEN_NE;}
-"null"			{yycol+=(yyleng+1);return TOKEN_NULL;}
-"print"			{yycol+=(yyleng+1);return TOKEN_PRINT;}
-"||"			{yycol+=(yyleng+1);return TOKEN_OR;}
-"integer"		{yycol+=(yyleng+1);return TOKEN_INTEGER;}
-"BEGIN"			{yycol+=(yyleng+1);return TOKEN_BEGIN;}
-"END" 			{yycol+=(yyleng+1);return TOKEN_END;}
-"function"		{yycol+=(yyleng+1);return TOKEN_FUNCTION;}
-"if"			{yycol+=(yyleng+1);return TOKEN_IF;}
-"then"			{yycol+=(yyleng+1);return TOKEN_THEN;}
-"else"			{yycol+=(yyleng+1);return TOKEN_ELSE;}
-"while"			{yycol+=(yyleng+1);return TOKEN_WHILE;}
-"do"			{yycol+=(yyleng+1);return TOKEN_DO;}
-"array"			{yycol+=(yyleng+1);return TOKEN_ARRAY;}
-"of"			{yycol+=(yyleng+1);return TOKEN_OF;}
-"var"			{yycol+=(yyleng+1);return TOKEN_VAR;}
-"new"			{yycol+=(yyleng+1);return TOKEN_NEW;}
-"dispose"		{yycol+=(yyleng+1);return TOKEN_DISPOSE;}
-"println"		{yycol+=(yyleng+1);return TOKEN_PRINTLN;}
-"false"			{yycol+=(yyleng+1);return TOKEN_FALSE;}
-"true"			{yycol+=(yyleng+1);return TOKEN_TRUE;}
-"return"		{yycol+=(yyleng+1);return TOKEN_RETURN;}
-"type"			{yycol+=(yyleng+1);return TOKEN_TYPE;}
-"boolean"		{yycol+=(yyleng+1);return TOKEN_BOOLEAN;}
+{character}	 	{column+=(yyleng+1);return CHARACTER;}
+"procedure"		{column+=(yyleng+1);return TOKEN_PROCEDURE;}
+":="			{column+=(yyleng+1);return TOKEN_AFF;}
+"&&"			{column+=(yyleng+1);return TOKEN_AND;}
+"character"		{column+=(yyleng+1);return TOKEN_CHARACTER;}
+".."			{column+=(yyleng+1);return TOKEN_DOTDOT;}
+"<="			{column+=(yyleng+1);return TOKEN_LE;}
+">="			{column+=(yyleng+1);return TOKEN_GE;}
+"!="			{column+=(yyleng+1);return TOKEN_NE;}
+"null"			{column+=(yyleng+1);return TOKEN_NULL;}
+"print"			{column+=(yyleng+1);return TOKEN_PRINT;}
+"||"			{column+=(yyleng+1);return TOKEN_OR;}
+"integer"		{column+=(yyleng+1);return TOKEN_INTEGER;}
+"BEGIN"			{column+=(yyleng+1);return TOKEN_BEGIN;}
+"END" 			{column+=(yyleng+1);return TOKEN_END;}
+"function"		{column+=(yyleng+1);return TOKEN_FUNCTION;}
+"if"			{column+=(yyleng+1);return TOKEN_IF;}
+"then"			{column+=(yyleng+1);return TOKEN_THEN;}
+"else"			{column+=(yyleng+1);return TOKEN_ELSE;}
+"while"			{column+=(yyleng+1);return TOKEN_WHILE;}
+"do"			{column+=(yyleng+1);return TOKEN_DO;}
+"array"			{column+=(yyleng+1);return TOKEN_ARRAY;}
+"of"			{column+=(yyleng+1);return TOKEN_OF;}
+"var"			{column+=(yyleng+1);return TOKEN_VAR;}
+"new"			{column+=(yyleng+1);return TOKEN_NEW;}
+"dispose"		{column+=(yyleng+1);return TOKEN_DISPOSE;}
+"println"		{column+=(yyleng+1);return TOKEN_PRINTLN;}
+"false"			{column+=(yyleng+1);return TOKEN_FALSE;}
+"true"			{column+=(yyleng+1);return TOKEN_TRUE;}
+"return"		{column+=(yyleng+1);return TOKEN_RETURN;}
+"type"			{column+=(yyleng+1);return TOKEN_TYPE;}
+"boolean"		{column+=(yyleng+1);return TOKEN_BOOLEAN;}
 
 
-{integer}		{yycol+=(yyleng+1);
+{integer}		{column+=(yyleng);
 					tmp=atoi(yytext);
-            		if((-32768>tmp)||(tmp>32767)){
+            		if((tmp<INT_MIN)||(INT_MAX>tmp)){
             			error_nb++;
-						fprintf(stderr, "Error n.%d : the integer \"%d\"  at (%d,%d) is too small.\n",error_nb, tmp, yylineo, yycol);
+						fprintf(stderr, "Error n.%d : the integer \"%d\"  at l:%d, c:%d is either too small or too big (%d, %d).\n",error_nb, tmp, line, column-yyleng, INT_MIN, INT_MAX);
 					} else return INTEGER; 
 				}
 
-{comment1}		{	yycol+=(yyleng+1);
+{comment1}		{	column+=(yyleng+1);
 					/*++numEL;*/
                 	printf("Multi-line commentary accepted.\n"); 
 					/*yylval.Chaine=strdup(yytext);*/
           			return 0;
 				}
 
-{comment2}		{	yycol+=(yyleng+1);
+{comment2}		{	column+=(yyleng+1);
 					/*++numEL;*/
                 	printf("Mono-line commentary accepted.\n"); 
 					/*yylval.Chaine=strdup(yytext);*/
           			return 0;
 				}
 
-{identifier}	{	yycol+=(yyleng+1); 
+{identifier}	{	column+=(yyleng+1); 
 					if(strlen(yytext)>30){
 						error_nb++;
-                  		fprintf(stderr, "LEXICAL ERROR %d: the identifier \"%s\" at (%d,%d) is too long.\n", error_nb ,yytext, yylineo, yycol);
+                  		fprintf(stderr, "LEXICAL ERROR %d: the identifier \"%s\" at l:%d, c:%d is too long.\n", error_nb ,yytext, line, column-yyleng+1);
 					} else return IDENTIFIER;
 				}
 
 
+{operator}		{column++;}
+" "				{column++; }
+"\t"			{column++; }
+"\n"			{line++; column=1;}
 
-" "				{yycol++; }
-"\t"			{yycol+=2; }
-"\n"			{yylineo++;yycol=0; }
 
 .				{	error_nb++; 
-					fprintf(stderr, "Lexical error n.%d at (%d,%d) : \"%s\" unknown. \n", error_nb, yylineo, yycol, yytext);
+					fprintf(stderr, "Lexical error n.%d at l:%d, c:%d : \"%s\" unknown. \n", error_nb, line, column-yyleng+1, yytext);
 				}
 
 %%
