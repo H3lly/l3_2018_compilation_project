@@ -1,24 +1,26 @@
 %{
-#include<stdio.h>
-#include<stdlib.h>
-#include "lea.tab.h"
-extern YYSTYPE yylval;
-int yycol =1,yylineo =1, error_nb =0, tmp;
-FILE *yyin;
+	#include<stdio.h>
+	#include<stdlib.h>
+	#include "lea.init.tab.h"
+	extern YYSTYPE yylval;
+
+	int yycol =1;
+	int yylineo =1;
+	int error_nb = 0;
+	int tmp;
+	FILE *yyin;
 %}
 
 integer (("0x"([0-9]|[A-F])+)|("-"(0|[1-9][0-9]*))|((0|[1-9][0-9]*)))
 identifier [a-zA-Z][a-zA-Z0-9]*
-char [a-zA-Z\d]
+character "'"[a-zA-Z]"'"
 comment1	^(\/\*)(.|\n)*(\*\/)$
 comment2	^(\/\/).*$
 
 %%
 
 
-"'"{char}"'" 	{yycol+=(yyleng+1);return CHARACTER;}
-{identifier}	{yycol+=(yyleng+1);return IDENTIFIER;}
-{integer}		{yycol+=(yyleng+1);return INTEGER;}
+{character}	 	{yycol+=(yyleng+1);return CHARACTER;}
 "procedure"		{yycol+=(yyleng+1);return TOKEN_PROCEDURE;}
 ":="			{yycol+=(yyleng+1);return TOKEN_AFF;}
 "&&"			{yycol+=(yyleng+1);return TOKEN_AND;}
@@ -31,7 +33,6 @@ comment2	^(\/\/).*$
 "print"			{yycol+=(yyleng+1);return TOKEN_PRINT;}
 "||"			{yycol+=(yyleng+1);return TOKEN_OR;}
 "integer"		{yycol+=(yyleng+1);return TOKEN_INTEGER;}
-
 "BEGIN"			{yycol+=(yyleng+1);return TOKEN_BEGIN;}
 "END" 			{yycol+=(yyleng+1);return TOKEN_END;}
 "function"		{yycol+=(yyleng+1);return TOKEN_FUNCTION;}
@@ -40,7 +41,6 @@ comment2	^(\/\/).*$
 "else"			{yycol+=(yyleng+1);return TOKEN_ELSE;}
 "while"			{yycol+=(yyleng+1);return TOKEN_WHILE;}
 "do"			{yycol+=(yyleng+1);return TOKEN_DO;}
-"readln"		{yycol+=(yyleng+1);return TOKEN_READLN;}
 "array"			{yycol+=(yyleng+1);return TOKEN_ARRAY;}
 "of"			{yycol+=(yyleng+1);return TOKEN_OF;}
 "var"			{yycol+=(yyleng+1);return TOKEN_VAR;}
@@ -53,59 +53,54 @@ comment2	^(\/\/).*$
 "type"			{yycol+=(yyleng+1);return TOKEN_TYPE;}
 "boolean"		{yycol+=(yyleng+1);return TOKEN_BOOLEAN;}
 
+
 {integer}		{yycol+=(yyleng+1);
 					tmp=atoi(yytext);
             		if((-32768>tmp)||(tmp>32767)){
             			error_nb++;
-						printf("Error n.%d : the integer \"%d\"  at (%d,%d) is too small.\n",error_nb, tmp, yylineo, ncol);
+						fprintf(stderr, "Error n.%d : the integer \"%d\"  at (%d,%d) is too small.\n",error_nb, tmp, yylineo, yycol);
 					} else return INTEGER; 
 				}
 
-
-
-{comment1}		{	ncol+=(yyleng+1);++numEL;
+{comment1}		{	yycol+=(yyleng+1);
+					/*++numEL;*/
                 	printf("Multi-line commentary accepted.\n"); 
-					yylval.Chaine=strdup(yytext);
-          			return comment1;/*what's comment1 ?*/
+					/*yylval.Chaine=strdup(yytext);*/
+          			return 0;
 				}
 
-{comment2}		{	ncol+=(yyleng+1);++numEL;
+{comment2}		{	yycol+=(yyleng+1);
+					/*++numEL;*/
                 	printf("Mono-line commentary accepted.\n"); 
-					yylval.Chaine=strdup(yytext);
-          			return comment2;/*??? same*/
+					/*yylval.Chaine=strdup(yytext);*/
+          			return 0;
 				}
 
 {identifier}	{	yycol+=(yyleng+1); 
 					if(strlen(yytext)>30){
 						error_nb++;
-                  		printf(" LEXICAL ERROR %d: the identifier \"%s\" at (%d,%d) is too long.\n",error_nb ,yytext, yylineo, yycol);
+                  		fprintf(stderr, "LEXICAL ERROR %d: the identifier \"%s\" at (%d,%d) is too long.\n", error_nb ,yytext, yylineo, yycol);
 					} else return IDENTIFIER;
-			}
+				}
 
 
 
+" "				{yycol++; }
+"\t"			{yycol+=2; }
+"\n"			{yylineo++;yycol=0; }
 
-
-" "		{yycol++; }
-"\t"		{yycol+=2; }
-"\n"		{yylineo++;yycol=0; }
-
-.		{ error_nb++; 
-		printf("Erreur lexicale %d à la position (%d,%d) : %s est une entité non reconnue \n",error_nb,yylineo,ncol,yytext);
-		}
+.				{	error_nb++; 
+					fprintf(stderr, "Lexical error n.%d at (%d,%d) : \"%s\" unknown. \n", error_nb, yylineo, yycol, yytext);
+				}
 
 %%
 
 int yywrap(void){
   return 0;
-
 }
 
-int main(int argc, char *argv[])
-{
-
-yyin=fopen(argv[1],"r");
-yylex();
-fclose(yyin);
-
-}
+/*int main(int argc, char *argv[]){
+	yyin = fopen(argv[1],"r");
+	yylex();
+	fclose(yyin);
+}*/
