@@ -83,6 +83,8 @@ comment2	^(\/\/).*$
           			return 0;
 				}
 
+
+
 {identifier}	{	column+=(yyleng+1); 
 					if(strlen(yytext)>30){
 						error_nb++;
