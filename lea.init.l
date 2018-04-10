@@ -58,7 +58,7 @@ comment2	^(\/\/).*$
 
 {integer}		{column+=(yyleng);
 					tmp=atoi(yytext);
-            		if((tmp<INT_MIN)||(INT_MAX>tmp)){
+            		if((tmp<INT_MIN)||(INT_MAX<tmp)){
             			error_nb++;
 						fprintf(stderr, "Error n.%d : the integer \"%d\"  at l:%d, c:%d is either too small or too big (%d, %d).\n",error_nb, tmp, line, column-yyleng, INT_MIN, INT_MAX);
 					} else return INTEGER; 
